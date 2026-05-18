@@ -1,0 +1,119 @@
+# README: TechFreq's Custom Server Panel Mod Customization Guide
+
+This README explains how to customize the `windows.xml` file in this mod, which adds branded UI elements to various menus in 7 Days to Die (e.g., pause menu, inspect panel, join dialog, backpack). The mod uses XPath <append> to add elements without overwriting vanilla UI.
+
+## General Tips
+- **Editing Basics**: Use a text editor like Notepad++ or VS Code. Always backup files before changes. Test in-game (e.g., open ESC for pause menu) and use console (F1) command 'reloadui' to refresh without restarting.
+- **Localization Integration**: Text is pulled from `Localization.txt` via 'text_key' (e.g., text_key="tf_headerTitle" shows "TechFreq 7DTD Server Panel"). Edit Localization.txt for easy updates (format: Key,Context,English,...). Add new keys there first, then reference in XML. Example: Add "tf_newButton,UI,New Button,Custom Tooltip" to Localization.txt, then use text_key="tf_newButton" in XML.
+- **Transparency**: Use globalopacitymod="0.5" to multiply opacity (halve it). If it fails, combine with color="R,G,B,A" (low A like 128 for 50% base opacity). Example: color="255,255,255,128" for semi-transparent white tint.
+- **Adding/Modifying Elements**: Copy <append> blocks and adjust xpath (e.g., "/windows/window[@name='windowSkills']" for skills menu). Use <set> for vanilla changes (e.g., <set xpath=".../@color">newvalue</set>).
+- **Advanced Capabilities**: Bind dynamic values (e.g., value="{playername}"), add conditionals (visible="{isadmin}"), or use controllers for interactivity (requires mod code). Check output_log.txt for errors.
+- **Pitfalls**: Conflicts with other UI mods; test on different resolutions; external URLs need internet. Export base game XML with 'exportcurrentconfigs' in console for reference.
+
+## Pause Menu Custom UI (ingameMenu)
+Overview: Appends images, text, and buttons to the ESC menu for branding/links.
+
+### Header Image
+This <texture> displays a logo/image.
+- Detailed Customization: 
+  - 'name="TechFreqHeaderLogo"': Unique identifier; change if duplicating (e.g., "MySecondLogo").
+  - 'texture="@url"': The image source; replace with your link (e.g., texture="@https://example.com/my-logo.png"). Use local mod files like "@modfolder:Resources/myimage.png" for offline support.
+  - 'width' and 'height': Size in pixels; match your image to avoid distortion (e.g., width="600" height="300" for rectangular). Too large may clip off-screen.
+  - 'pos="X,Y"': Position relative to anchor (X: positive right, negative left; Y: positive down, negative up). Example: pos="0,-300" to center higher up.
+  - 'anchor' and 'pivot': Alignment (anchor pins to screen edge, e.g., "left,bottom" for bottom-left; pivot is image's center point, e.g., "top" to align from top).
+  - 'depth': Layering order (higher = on top; e.g., depth="5" to overlay buttons). If image hides text, increase text depth.
+  - 'material': "Materials/Transparent Colored" for PNGs with alpha; change to "Materials/Main Grey" for grayscale tint.
+  - Transparency: Add globalopacitymod="value" (0.0 fully transparent, 1.0 opaque; e.g., globalopacitymod="0.5" for 50% see-through). If it doesn't work alone, combine with color="R,G,B,A" (e.g., color="255,255,255,128" for white tint at 50% base opacity—this often fixes stubborn cases).
+  - Example 1: Smaller, transparent, tinted red (using color for opacity): <texture ... width="400" height="400" color="255,0,0,128" /> (50% opaque red tint).
+  - Example 2: Move to bottom-center with multiplied opacity: pos="0,400" anchor="center,bottom" globalopacitymod="0.7".
+  - More Example: Add a second image below: Copy the <append> block, change name="SecondaryLogo" pos="970,-700" texture="@new-url.jpg" depth="1" (layers under main image).
+  - Advanced Example: Dynamic tint based on time: Requires custom controller, but add color="{daytint}" (mod code needed). Or rotate: rotation="45" for angled.
+  - Pitfalls: External URLs may lag if offline; use local assets. If transparency fails (e.g., image stays opaque), ensure the PNG has an alpha channel, add color with low A, and 'reloadui'. Test on different resolutions.
+
+### Title Text
+This <label> displays static or localized text for headers.
+- Detailed Customization: 
+  - 'name="TechFreqTitle"': Unique name; change for multiples (e.g., "SubTitle").
+  - 'text_key="tf_headerTitle"': Pulls from Localization.txt (your key shows "TechFreq 7DTD Server Panel"). Change to another key (e.g., text_key="tf_headerMotto" to reuse "Welcome to the TechFreq Community!"). For raw text (no localization), replace with text="Your Server Name".
+  - Localization Tip: In Localization.txt, edit the English value (e.g., change "TechFreq 7DTD Server Panel" to "My Custom Server"). Add new keys like "tf_newTitle,UI,New Header Text" and use text_key="tf_newTitle" here. For multi-language, add columns (e.g., tf_headerTitle,UI,TechFreq 7DTD Server Panel,French Translation).
+  - 'font_size': Text scale (e.g., font_size="60" for larger; too big may overflow).
+  - 'color="R,G,B,A"': Color and opacity (R/G/B 0-255 for hue, A for transparency; e.g., color="0,255,0,180" for semi-transparent green). Use this for direct opacity control if globalopacitymod fails.
+  - 'pos="X,Y"', 'anchor', 'pivot': Positioning/alignment (e.g., pos="200,100" anchor="right,top" to pin top-right).
+  - 'width' and 'height': Text box size (e.g., width="800" for shorter line; height auto-adjusts usually).
+  - 'justify': Text alignment ( "center" default; "left" for left-aligned, "right" for right).
+  - 'effect="Outline8"': Visual effect ( "Outline8" for thick outline; "Shadow" for drop shadow; "None" to disable). 'effect_color' sets color (e.g., "255,0,0,255" red), 'effect_distance' thickness (e.g., "1,1" thinner).
+  - Transparency: Add globalopacitymod="0.7" for faded text, or use color with low A (e.g., color="255,255,255,128" for 50% opaque white—this often works when mod alone doesn't).
+  - Example 1: Reuse your key with yellow, left-aligned, no effect: <label ... text_key="tf_headerTitle" color="255,255,0,255" justify="left" effect="None" /> (displays "TechFreq 7DTD Server Panel" in yellow).
+  - Example 2: New localized key, smaller, transparent, shadowed: Add to Localization.txt "tf_smallTitle,UI,Small Header"; then <label ... text_key="tf_smallTitle" font_size="30" globalopacitymod="0.8" effect="Shadow" effect_distance="2,2" color="255,255,255,150" /> (semi-transparent).
+  - More Example: Dynamic player name: text_key="tf_headerTitle" value=" {playername}'s Server" (combines key with binding; displays e.g., "TechFreq 7DTD Server Panel John's Server").
+  - Advanced Example: Conditional text: Add visible="{isadmin}" text_key="tf_adminTitle" (shows only for admins; add key "tf_adminTitle,UI,Admin Panel" to Localization.txt).
+  - Pitfalls: If text doesn't show, verify key exists in Localization.txt or switch to raw text. Overlaps? Adjust depth or pos. If transparency fails, try color with A first, then add globalopacitymod.
+
+### Motto/Sub-Title
+Same as Title Text, but smaller.
+- Detailed Customization: (See Title Text for full details).
+  - 'text_key="tf_headerMotto"': Your key shows "Welcome to the TechFreq Community!"—change to "tf_inspectWelcome" for "Welcome to TechFreqs Inspect Menu!".
+  - Localization Tip: Edit Localization.txt to update (e.g., change English to "Join Now!"). Add new key like "tf_newMotto,UI,New Motto Text" and set text_key="tf_newMotto".
+  - Capabilities: Stack multiple by copying the block and adjusting 'pos' (e.g., add another with pos="0,170").
+  - Transparency: Use color with low A or globalopacitymod (e.g., color="200,200,200,150" for 60% opaque gray).
+  - Example 1: Reuse your key, change to blue, no outline: text_key="tf_headerMotto" color="0,0,255,255" effect="None" (displays "Welcome to the TechFreq Community!" in blue).
+  - Example 2: New key with transparency and uppercase: Add to Localization.txt "tf_upperMotto,UI,JOIN US"; then <label ... text_key="tf_upperMotto" globalopacitymod="0.6" upper_case="true" color="255,255,255,128" /> (50% transparent uppercase).
+  - More Example: Add a third motto: Copy block, name="TechFreqExtraMotto" pos="0,170" text_key="tf_newMotto" (add key to Localization.txt first).
+  - Advanced Example: Time-based: value="Day {daynumber}" (dynamic, no key needed; displays "Day 5").
+  - Pitfalls: Ensure 'depth' is higher than background for visibility; test transparency with 'reloadui'; add new keys to Localization.txt.
+
+### Discord Button (and Similar Buttons)
+This <rect> creates a clickable button with text. All button sections (Discord, Music, etc.) share the same customization options.
+- Detailed Customization: 
+  - 'name="btnTechFreqDiscord"': Unique; change for copies (e.g., "btnMyNewLink").
+  - 'sources="url"': Loads link data from external XML; update to your file (e.g., sources="https://myrepo.com/NewLink.xml").
+  - 'width/height': Button size (e.g., width="400" height="50" for larger).
+  - 'pos="X,Y"': Position (e.g., pos="200,-520" to shift right; adjust Y by +60 for stacking).
+  - 'anchor': Alignment (e.g., anchor="left,center" for left-screen).
+  - 'depth': Layer (e.g., depth="40" to be above images).
+  - Inside <button>: 'hoverscale="1"': Hover zoom (e.g., "1.1" for slight enlarge). 'defaultcolor/hovercolor="R,G,B,A"': Colors (e.g., defaultcolor="0,255,0,255" green; hovercolor="0,200,0,150" faded hover—use low A for transparent hover).
+  - 'type="sliced"': Style ( "sliced" for scalable; "filled" for solid; "simple" for basic).
+  - 'tooltip_key': Hover text from localization—your "tf_link1" shows "Discord (Join our server chat!)"; change to "tf_link2" for "Music (Listen to our playlist!)".
+  - Inside <label>: Text customization like Title—'text_key="tf_link1"' shows "Discord"; change to "tf_link3" for "Nexus Mods".
+  - Localization Tip: Your keys like "tf_link1,UI,Discord (Join our server chat!)" are perfect for buttons. Add new ones in Localization.txt (e.g., "tf_link6,UI,Website (Visit our site!)") and use text_key="tf_link6" here. For tooltips, edit "tf_link1" to add descriptions (e.g., "tf_link1,UI,Discord,Join Discord tooltip").
+  - Transparency: Add to <rect> or <button> (e.g., <rect ... globalopacitymod="0.8" /> or defaultcolor="100,100,255,128" for 50% opaque base).
+  - Example 1: Wider green button with icon and your key: width="400" defaultcolor="0,255,0,255" text_key="tf_link1" (displays "Discord"); add <sprite name="icon" sprite="ui_game_symbol_discord" pos="10,-10" size="30,30" /> inside <rect>.
+  - Example 2: Transparent hover with new key: Add to Localization.txt "tf_newLink,UI,New Button (Custom link example)"; then hovercolor="100,100,255,128" globalopacitymod="0.5" text_key="tf_newLink" (effective 25% opacity on hover, displays "New Button (Custom link example)").
+  - More Example: Add an extra button below Support: Copy the <append> block, change name="btnExtra" pos="0,-820" sources="your-new-url.xml" text_key="tf_link6" tooltip_key="tf_link6" (add key to Localization.txt first; displays "Website (Visit our site!)").
+  - Advanced Example: Conditional button (e.g., admin-only): Add visible="{isadmin}" to <rect> (shows only for admins). Or add sound: <button ... sound="[button_click]" /> (define in sounds.xml). For a grid of buttons: Replace <rect> with <grid rows="2" cols="3" cell_width="320" cell_height="46"> and add multiple <rect> inside.
+  - Pitfalls: If links don't open, check external XML file. Buttons may not work offline if sources are remote. If transparency fails on button, use color with low A in defaultcolor/hovercolor and 'reloadui'. If text is wrong, verify Localization.txt.
+
+### Music Button
+Identical to Discord Button. See above for details. Example: Add new key "tf_musicExtra,UI,Extra Music (Bonus playlist)" to Localization.txt, then text_key="tf_musicExtra".
+
+### Nexus Mods Button
+Identical to Discord Button. See above. Example: For extra tooltip, edit Localization.txt "tf_link3,UI,Nexus Mods (Download mods here!)".
+
+### Socials Button
+Identical to Discord Button. See above. Example: Add grid for sub-social buttons: Use <grid> inside <rect> with child <rect> for Twitter/Facebook, each with own text_key (add keys to Localization.txt).
+
+### Support Button
+Identical to Discord Button. See above. More Example: Add a donation button: Copy block, text_key="tf_link5" defaultcolor="255,215,0,255" (gold color).
+
+### Inspect Panel Image (emptyInfoPanel)
+Appends image and text to the empty inspect panel.
+- Detailed Customization: (See XML comments for full; similar to Header Image and Title Text).
+  - Localization: 'text_key="tf_inspectWelcome"' shows "Welcome to TechFreqs Inspect Menu!"—change to "tf_joinWelcome".
+  - Example: Add new key "tf_inspectTip,UI,Tip: Craft Here" to Localization.txt, then insert another <label ... text_key="tf_inspectTip" pos="430,120" />.
+  - More Example: Add button: Insert <rect ... text_key="tf_link1" /> inside <append> (reuses "Discord").
+
+### Server Join Dialog (serverjoinrulesdialog)
+Customizes join popup.
+- Detailed Customization: (See XML comments; similar to images and labels).
+  - Localization: 'text_key="tf_joinWelcome"' shows "Welcome to TechFreqs Custom Join Rules Panel!"—change to "tf_headerMotto".
+  - Example: Add new key "tf_rulesTip,UI,Read the Rules" to Localization.txt, then insert <label ... text_key="tf_rulesTip" pos="0,-300" />.
+  - More Example: Add accept button: Insert <rect name="btnAccept" ... text_key="tf_joinButton" /> (add key "tf_joinButton,UI,Accept" to Localization.txt).
+
+### Backpack Customization (windowBackpack)
+Adds header and background to inventory.
+- Detailed Customization: (See XML comments; similar to images and labels).
+  - Localization: Label uses raw text—switch to text_key="tf_backpackTitle" for "MY BACKPACK".
+  - Example: Add new key "tf_backpackSub,UI,Items Here" to Localization.txt, then insert <label ... text_key="tf_backpackSub" pos="350,15" />.
+  - More Example: Add extra background element: Copy <texture> block inside <append>, change name="ExtraBG" pos="300,-200" texture="@new-url.jpg" color="255,255,255,128" (transparent overlay).
+
+For more help, check the mod's Nexus page or ask in the community. Happy modding!

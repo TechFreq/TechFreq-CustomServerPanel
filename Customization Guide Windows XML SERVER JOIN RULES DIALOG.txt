@@ -1,0 +1,116 @@
+<!-- 
+    ## Detailed Customization Guide for Server Join Dialog
+    This guide explains how to customize this specific section (the <append> to serverjoinrulesdialog). It's non-destructive—edits append to vanilla UI. **Test changes** with console command 'reloadui' (F1). Backup your XML and check output_log.txt for errors. For full mod context, see other sections.
+
+    ### Overview
+    - **Purpose**: Enhances the join popup with a branded background, welcome text, and grids for rules/info. Grids auto-size (rows="0") for dynamic content.
+    - **Key Features**: Localized text via Localization.txt; transparency support; easy add/remove of rules/info lines.
+    - **Requirements**: Set server rules in serverconfig.xml to trigger the dialog. Uses keys like tf_joinWelcome—ensure they exist in Localization.txt.
+
+    ### Basic Customizations
+    - **Background Image (<texture>)**: Displays your TechFreq logo. 
+      - Change image: texture="@new_url" (e.g., local: "@modfolder:Resources/rules_bg.png" for offline use).
+      - Resize/Reposition: width="600" height="600" pos="0,100" (positive Y moves down).
+      - Transparency: Add color="255,255,255,128" globalopacitymod="0.7" (50% faded white—combine for best results if one fails).
+    - **Welcome Label (<label>)**: Main greeting, pulled from tf_joinWelcome.
+      - Edit text: Change in Localization.txt (e.g., English to "Join the Apocalypse!").
+      - Style tweaks: font_size="32" for larger; color="255,0,0,255" for red; justify="left" for alignment; effect="Shadow" for drop shadow.
+      - Position: pos="0,-150" to move up; add upper_case="true" for ALL CAPS.
+    - **Hiding Vanilla Text (<set>)**: Hides stock label to avoid overlap.
+      - Disable: Remove the entire <set> line (shows vanilla rules alongside grids).
+      - Alternative: Change to <set ... >true</set> to force vanilla text visible.
+    - **Header Labels**: Titles for grids, using tf_serverRulesTitle and tf_serverInfoTitle.
+      - Edit: Update in Localization.txt (e.g., tf_serverRulesTitle to "Server Guidelines").
+      - Style: font_size="28" color="[green]" for green text; add tooltip_key="tf_serverRulesTooltip" (create key in Localization.txt for hover like "Read me!").
+    - **Grids (<grid>)**: Lists for rules/info—left for rules (pos="20,-42"), right for info (pos="470,-42").
+      - Layout: cell_width="400" cell_height="28" for spacing; font_size="14" for bigger text; arrangement="horizontal" for side-by-side (adjust pos to avoid overlap).
+      - Add/Remove Items: Insert/delete <label> tags (e.g., add <label depth="3" color="[white]" text_key="tf_rule9" /> and tf_rule9 key in Localization.txt).
+      - Transparency: Add to <grid ... globalopacitymod="0.8" /> for faded grid.
+
+    ### Localization and Content
+    - **How It Works**: All <label> use text_key (e.g., tf_rule1)—edit text in Localization.txt without XML changes.
+      - Add new key: In Localization.txt, append "tf_rule9,UI,- New Rule Text"; then add <label ... text_key="tf_rule9" /> in XML.
+      - Multi-Language: Add columns (e.g., tf_rule1,UI,- English,French Translation).
+      - Fallback: If key missing, switch to raw text="Custom Text" in XML (no Localization.txt needed).
+    - **Tips**: Keep lines short (<60 chars) for readability. For dynamic text, use value="{playername} Welcome!" in a <label>.
+
+    ### Examples
+    - **Example 1: Add a New Rule with Custom Style**: Insert in rules <grid>: <label depth="3" color="[yellow]" text_key="tf_rule9" font_size="14" />; add tf_rule9,UI,- Yellow Highlighted Rule! to Localization.txt (displays larger yellow text).
+    - **Example 2: Transparent Info Grid with Tooltip**: Add to info <grid ... globalopacitymod="0.7" />; for first <label>, add tooltip_key="tf_infoTooltip"; create tf_infoTooltip,UI,Server IP Details in Localization.txt (faded grid with hover tooltip).
+    - **Example 3: Bigger Background + Raw Text Fallback**: <texture ... width="600" height="600" color="200,200,200,150" />; change a <label> to text="Hardcoded Rule" (ignores Localization.txt).
+
+    ### Advanced Tips
+    - **Borders/Decorations**: Add inside a <grid>: <sprite name="gridBorder" sprite="menu_empty3px" color="[red]" type="sliced" fillcenter="false" pos="0,0" width="440" height="300" globalopacitymod="0.5" /> (red border, semi-transparent).
+    - **Conditional Visibility**: Add to <grid ... visible="{isnewplayer}" /> (shows only for new players—requires game bindings).
+    - **Adding Buttons**: Copy from your pause menu (e.g., insert <rect name="btnAccept" ... > like Example 2 in original guide; pos="0,-500" to place below grids).
+    - **Integration**: Link to other mod parts (e.g., add text_key referencing tf_link1 for "Discord" in a rule).
+
+    ### Pitfalls and Troubleshooting
+    - **Common Issues**: Grids overflow? Reduce cell_height="24" or limit labels to 10. Text blank? Verify keys in Localization.txt (case-sensitive, no typos). Overlaps? Increase depth="13" or tweak pos (e.g., rules pos="20,-50").
+    - **Transparency Fixes**: If not fading, prioritize color with low A (e.g., 128), then globalopacitymod. Test on different resolutions.
+    - **Other**: Dialog skips if no server rules—set in serverconfig.xml. Changes not showing? Use 'reloadui'. If adding many keys, organize Localization.txt with comments (e.g., # Rules Section).
+    -->
+
+
+
+ <!-- TechFreqs SERVER JOIN DIALOG -->
+    <!-- Overview: Customizes the server join/rules popup with a background image and welcome text. -->
+    <append xpath="/windows/window[@name='serverjoinrulesdialog']/panel[@name='content']">
+        <texture name="TechFreqJoinBackground"
+                 anchor="center"
+                 pivot="center"
+                 pos="0,50"
+                 width="512"
+                 height="512"
+                 depth="10"
+                 material="Materials/Transparent Colored"
+                 texture="@https://i.imgur.com/0NLqFK7.jpeg" />
+
+        <label name="TechFreqJoinLabel"
+               width="600"
+               height="300"
+               anchor="center"
+               pivot="center"
+               pos="0,-200"
+               depth="11"
+               text_key="tf_joinWelcome"
+               font_size="28"
+               justify="center"
+               effect="Outline8"
+               effect_color="0,0,0,255"
+               effect_distance="1,1" />
+
+        <!-- Hide Vanilla Confirmation Text to Make Room for Grids -->
+        <set xpath="label[@name='labelConfirmationText']/@visible">false</set> <!-- Non-destructive hide; remove this line to show vanilla text alongside -->
+
+        <!-- Server Rules Section (Left Grid) - Example TechFreq Rules -->
+        <label pos="10,-10" depth="12" color="[red]" text_key="tf_serverRulesTitle" font_size="24" /> <!-- Suggestion: Add to Localization.txt: tf_serverRulesTitle,UI,TECHFREQ RULES -->
+
+        <grid pos="20,-42" rows="0" cell_width="440" cell_height="32" repeat_content="false" arrangement="vertical" font_size="12" depth="12">
+            <!-- Example rules: Edit/remove; kept short and welcoming -->
+            <label depth="3" color="[white]" text_key="tf_rule1" /> <!-- Ties into tf_headerMotto -->
+            <label depth="3" color="[white]" text_key="tf_rule2" />
+            <label depth="3" color="[white]" text_key="tf_rule3" /> <!-- References your button -->
+            <label depth="3" color="[white]" text_key="tf_rule4" />
+            <label depth="3" color="[white]" text_key="tf_rule5" />
+            <label depth="3" color="[white]" text_key="tf_rule6" />
+            <label depth="3" color="[white]" text_key="tf_rule7" />
+            <label depth="3" color="[white]" text_key="tf_rule8" /> <!-- References your button -->
+        </grid>
+
+        <!-- Server Information Section (Right Grid) - Example TechFreq Info -->
+        <label pos="460,-10" depth="12" color="[red]" text_key="tf_serverInfoTitle" font_size="24" /> <!-- Suggestion: Add to Localization.txt: tf_serverInfoTitle,UI,TECHFREQ INFO -->
+
+        <grid pos="470,-42" rows="0" cell_width="420" cell_height="32" repeat_content="false" arrangement="vertical" font_size="12" depth="12">
+            <!-- Example info: Edit/remove; includes server specs -->
+            <label depth="3" color="[white]" text_key="tf_info1" /> <!-- Replace with actual -->
+            <label depth="3" color="[white]" text_key="tf_info2" />
+            <label depth="3" color="[white]" text_key="tf_info3" />
+            <label depth="3" color="[white]" text_key="tf_info4" />
+            <label depth="3" color="[white]" text_key="tf_info5" />
+            <label depth="3" color="[white]" text_key="tf_info6" />
+            <label depth="3" color="[white]" text_key="tf_info7" />
+            <label depth="3" color="[white]" text_key="tf_info8" /> <!-- Fun closer -->
+        </grid>
+    </append>
+    

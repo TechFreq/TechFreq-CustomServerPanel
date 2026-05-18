@@ -1,0 +1,81 @@
+# README: Localization.txt Customization Guide for TechFreq's Custom Server Panel Mod
+
+This guide explains how to customize the `Localization.txt` file, which handles all text strings in the mod (e.g., button labels, titles, tooltips). It integrates with `windows.xml` via 'text_key' attributes (e.g., text_key="tf_headerTitle" pulls "TechFreq 7DTD Server Panel" from this file). 
+
+Localization allows easy text changes without editing XML, supports multi-language (e.g., English, French), and enables tooltips/descriptions. The file is a comma-separated (CSV-like) text file—use a plain editor like Notepad++ to edit (avoid Excel to prevent formatting issues).
+
+## File Format and Basics
+- **Location**: Place `Localization.txt` in your mod's root folder (e.g., Mods/TechFreqsCustomServerPanelInfoBox/Localization.txt).
+- **Structure**: First line is headers (Key,Context,English,...). Each subsequent line is a key entry.
+  - **Key**: Unique identifier (e.g., tf_headerTitle)—must match text_key in XML.
+  - **Context**: Usually "UI" for user interface text.
+  - **English**: The default text (e.g., "TechFreq 7DTD Server Panel"). Include tooltips in parentheses if desired (e.g., "Discord (Join our chat!)").
+  - **Additional Languages**: Optional columns (e.g., ,French,Spanish)—game auto-switches based on player settings.
+- **Comments**: Use # for notes (e.g., # Button Keys)—ignored by the game.
+- **Why Use It?**: Centralizes text for easy updates/multi-language. If a key is missing, text won't show in-game—fallback to raw 'text="value"' in XML.
+- **Testing**: Edit file, save, reload game/world, and check menus (e.g., ESC for pause). Use 'reloadui' in console (F1) if needed. Verify in output_log.txt for errors.
+
+## Original Keys in Your Mod
+These are the base keys from your mod—edit English for quick changes. Example file starts like this:
+
+Key,Context,English,French
+tf_headerTitle,UI,TechFreq 7DTD Server Panel,Panneau du Serveur TechFreq 7DTD
+tf_headerMotto,UI,"Welcome to the TechFreq Community!","Bienvenue dans la Communauté TechFreq!"
+tf_inspectWelcome,UI,"Welcome to TechFreqs Inspect Menu!","Bienvenue dans le Menu d'Inspection TechFreq!"
+tf_joinWelcome,UI,"Welcome to TechFreqs Custom Join Rules Panel!","Bienvenue dans le Panneau de Règles de Connexion Personnalisé TechFreq!"
+tf_backpackTitle,UI,"MY BACKPACK","MON SAC À DOS"
+tf_link1,UI,Discord (Join our server chat!),Discord (Rejoignez notre chat serveur!)
+tf_link2,UI,Music (Listen to our playlist!),Musique (Écoutez notre playlist!)
+tf_link3,UI,Nexus Mods (Download mods here!),Nexus Mods (Téléchargez des mods ici!)
+tf_link4,UI,Socials (Follow us on social media!),Réseaux Sociaux (Suivez-nous sur les réseaux!)
+tf_link5,UI,Support (Donate or get help!),Support (Faites un don ou obtenez de l'aide!)
+
+## How to Customize
+1. **Editing Existing Keys**: Change the English value (e.g., update tf_headerTitle to "My Awesome Server Panel"). Add tooltips in parentheses for hover text (e.g., "Discord (Click to join!)").
+2. **Adding New Keys**: Append lines at the end. Match format. Use for new buttons/text in XML.
+3. **Multi-Language Support**: Add columns (e.g., after English, add ,French Translation). Game detects player language.
+4. **Dynamic/Advanced Text**: In XML, combine with bindings (e.g., text_key="tf_headerTitle" value=" - Day {daynumber}" displays "TechFreq 7DTD Server Panel - Day 5").
+5. **Pitfalls**: Keys are case-sensitive. Missing keys show blank—double-check spelling in XML. File must be UTF-8 encoded for special chars. Test after edits with 'reloadui'.
+
+## Examples
+### Example 1: Editing an Existing Key
+- Original: tf_link1,UI,Discord
+- Customized: tf_link1,UI,Join Discord (Server chat link!),Rejoignez Discord (Lien du chat serveur!)
+- In XML: <label ... text_key="tf_link1" /> now shows "Join Discord (Server chat link!)" with tooltip support.
+
+### Example 2: Adding a New Key for an Extra Button
+- Add to Localization.txt: tf_link6,UI,Website (Visit our site!),Site Web (Visitez notre site!)
+- In XML: Copy a button <append> block (e.g., Discord), change text_key="tf_link6" tooltip_key="tf_link6" pos="0,-820" sources="your-website-url.xml".
+- Result: New "Website (Visit our site!)" button appears below Support.
+
+### Example 3: Adding a Key with Tooltip for Subtitle
+- Add to Localization.txt: tf_newMotto,UI,New Motto (Server tagline!),Nouvelle Devise (Slogan du serveur!)
+- In XML: In Motto section, change text_key="tf_newMotto".
+- Result: Displays "New Motto (Server tagline!)"—use in tooltips if XML supports.
+
+### Example 4: Multi-Language for Dynamic Text
+- Add to Localization.txt: tf_dynamicWelcome,UI,Welcome {playername} (Day {daynumber})!,Bienvenue {playername} (Jour {daynumber})!
+- In XML: <label ... text_key="tf_dynamicWelcome" /> (binds {playername} and {daynumber} automatically).
+- Result: Shows e.g., "Welcome John (Day 5)!" in English, or French equivalent.
+
+### Example 5: Adding Keys for Advanced Features (e.g., Conditional Text)
+- Add to Localization.txt: tf_adminTitle,UI,Admin Panel (Admin only!),Panneau Admin (Réservé aux admins!)
+- In XML: Add to a label: visible="{isadmin}" text_key="tf_adminTitle" (shows only for admins).
+- Result: Conditional text using your mod's localization.
+
+### Example 6: Expanding for Extra Buttons/Grid
+- Add multiple to Localization.txt:
+  tf_extraButton1,UI,Twitter (Follow us!),Twitter (Suivez-nous!)
+  tf_extraButton2,UI,Facebook (Like our page!),Facebook (Aimez notre page!)
+- In XML: Add a <grid> inside a <rect> for button layout: <grid rows="1" cols="2" cell_width="320" cell_height="46"> <rect ... text_key="tf_extraButton1" /> <rect ... text_key="tf_extraButton2" /> </grid>.
+- Result: A row of social buttons with localized text.
+
+## Best Practices
+- **Organization**: Group keys with comments (e.g., # Title Keys, # Button Keys) for readability.
+- **Adding Languages**: For full support, translate all English values and add columns (e.g., ,German). Test by changing game language in settings.
+- **Tooltips/Descriptions**: Include in English field (e.g., "Text (Tooltip)")—XML tooltip_key pulls the whole string.
+- **Dynamic Bindings**: Use placeholders like {playername}, {daynumber} in Localization.txt—they work with XML value bindings.
+- **Expanding the File**: For new mod features (e.g., a skills menu addition), add keys like "tf_skillsTitle,UI,Skills Header" and reference in XML.
+- **Troubleshooting**: If text is blank, check key spelling/matching. Reload game after edits. If mod conflicts, ensure Localization.txt is in the correct folder.
+
+For XML integration examples, see the comments in windows.xml. If you add new keys there, update XML accordingly. Happy customizing!

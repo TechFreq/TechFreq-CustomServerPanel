@@ -1,0 +1,156 @@
+Localization
+Key,Context,English
+
+tf_headerTitle,UI,TechFreq 7DTD Server Panel
+tf_headerMotto,UI,"Welcome to the TechFreq Community!"
+tf_inspectWelcome,UI,"Welcome to TechFreqs Inspect Menu!"
+tf_joinWelcome,UI,"Welcome to TechFreqs Custom Join Rules Panel!"
+tf_backpackTitle,UI,"MY BACKPACK"
+
+# Buttons for Pause Menu
+tf_link1,UI,Discord
+tf_link2,UI,Music
+tf_link3,UI,Nexus Mods
+tf_link4,UI,Socials
+tf_link5,UI,Support
+
+# New Key for Big Box Header in Pause Menu
+tf_serverName,UI,TechFreq Server | PVE | PVP| ETC | QOL MODDED # Edit this to your server name
+
+# Keys for Rules/Info in Big Box (and Join Dialog for consistency)
+tf_serverRulesTitle,UI,TECHFREQ RULES  # Merged; edit here
+tf_serverInfoTitle,UI,TECHFREQ INFO  # Merged; edit here
+
+# Keys for Grids (Edit English text here to change rules/info)
+tf_rule1,UI,- Welcome to TechFreqServer—be respectful and have fun!
+tf_rule2,UI,- No griefing or stealing—keep the community positive.
+tf_rule3,UI,- Join Discord for help (links ingame pause menu).
+tf_rule4,UI,- No exploits; report bugs for rewards!
+tf_rule5,UI,- Bases 100m apart; no blocking traders.
+tf_rule6,UI,- Spiek Traps for Zombie/Animals traps only—no player harm.
+tf_rule7,UI,- Fill holes and mark pitfalls as necessary.
+tf_rule8,UI,- Check Nexus Mods for extra content(pause menu link).
+
+tf_info1,UI,- IP:something.something.IP:26900
+tf_info2,UI,- Discord: https://discord.com/invite/SQCnGjNUhw
+tf_info3,UI,- Region: NA West
+tf_info4,UI,- Version: v2.2 with TechFreq Mods
+tf_info5,UI,- Difficulty: Warrior
+tf_info6,UI,- XP: 150% | Loot: 125%
+tf_info7,UI,- Bloodmoon: 12 | 4 Zombies/Player
+tf_info8,UI,- Thanks for joining—survive and thrive!
+
+# Optional: Tooltips for headers (add tooltip_key="tf_serverRulesTooltip" to the <label> in XML if desired) - Unused unless added to XML
+# tf_serverRulesTooltip,UI,Follow these rules to keep the community fun and fair!
+# tf_serverInfoTooltip,UI,Key server details—check here for settings and links.
+
+# You can add more keys for tooltips, extra buttons, etc.
+
+
+
+DETAILED PORTION
+<!-- Detailed Customization for Big Box (Big Header Section): 
+         This <panel> creates a big box under the PNG with a server name header and content (rules/info grids). It's non-destructive and localized. Test with 'reloadui' in pause menu.
+
+         - Box Container (<panel>): Main structure for the big header box.
+           - 'name="TechFreqBigBox"': Unique ID; change if duplicating.
+           - 'width' and 'height': Size (e.g., width="1400" height="700" for bigger). Height auto-adjusts with content.
+           - 'pos="X,Y"': Position (e.g., pos="400,-150" to move up; positive Y down). Anchor/pivot center it.
+           - 'depth': Layer (e.g., depth="5" to overlay other elements).
+           - Transparency: Add globalopacitymod="0.5" for overall fade (combine with sprite colors below).
+           - Example: Wider box - width="1400" pos="300,-200" globalopacitymod="0.6" (faded and shifted left).
+           - Pitfalls: Overlaps menu buttons? Increase depth or adjust pos. Test on different resolutions.
+
+         - Background and Border (<sprite>): Visual style for the box.
+           - boxBackground: Fills the box (color="[darkGrey]" for gray; change to "[black]" for darker).
+           - boxBorder: Outline (color="[red]" for red edge; change to "[white]" for white).
+           - Transparency: globalopacitymod="0.7" on each (e.g., 0.5 for more see-through).
+           - Example: Blue border with fade - boxBorder color="[blue]" globalopacitymod="0.5".
+           - Advanced: Add rotation="45" for angled border (uncommon but possible).
+           - Pitfalls: If opaque, ensure PNG has alpha; combine with color="R,G,B,128".
+
+         - Header Label: Server name at top (text_key="tf_serverName").
+           - 'text_key="tf_serverName"': Pulls from Localization.txt (edit English there). For raw text, change to text="My Server".
+           - Localization Tip: Edit in Localization.txt (e.g., tf_serverName,UI,New Name). Add languages with columns.
+           - Style: font_size="40" for larger; color="[yellow]" for yellow; justify="left" to align left.
+           - Position: pos="0,-20" to lower; add upper_case="true" for ALL CAPS.
+           - Effect: effect="Outline8" for outline; change to "Shadow" for drop shadow.
+           - Transparency: color="255,255,255,128" for 50% opaque white.
+           - Example: Dynamic name - text="{servername}" (auto-pulls game server name, no key needed).
+           - Pitfalls: Text missing? Check key in Localization.txt. Overlaps? Adjust pos or depth="4".
+
+         - Rules/Info Grids: Content inside box (left rules, right info).
+           - Headers: text_key="tf_serverRulesTitle" or "tf_serverInfoTitle" (edit in Localization.txt).
+           - Grid Layout: rows="0" for auto-size; cell_width="500" cell_height="28" for spacing; font_size="14" for larger text.
+           - Add/Remove Lines: Insert <label depth="3" color="[white]" text_key="tf_rule9" />; add tf_rule9,UI,- New Rule to Localization.txt.
+           - Transparency: Add globalopacitymod="0.8" to <grid> for fade.
+           - Example: New info line - Add <label depth="3" color="[white]" text_key="tf_info9" />; add tf_info9,UI,- New Info to Localization.txt.
+           - Advanced: Change arrangement="horizontal" for side-by-side; add tooltip_key for hovers (e.g., tooltip_key="tf_ruleTooltip").
+           - Pitfalls: Too many lines overflow? Limit to 10 or reduce cell_height. Text blank? Verify keys match Localization.txt.
+
+         - General Tips: All text is localized—edit Localization.txt for changes without XML edits. For dynamic content, use value="{playername}" in labels. 
+         - Advanced: Add icons with <sprite sprite="ui_game_symbol_map" pos="10,-10" size="30,30" /> inside <panel>.
+         - Pitfalls: Box clips off-screen? Reduce width or test resolutions. Transparency issues? Use color with low A first. Always 'reloadui' after changes. -->
+
+
+
+   <!-- Big Box Under PNG: Server Name Header with Rules/Info Content -->
+    <append xpath="/windows/window[@name='ingameMenu']">
+        <panel name="TechFreqBigBox"
+               depth="4"  
+               width="1200"
+               height="600"  
+               anchor="center,top"
+               pivot="center"
+               pos="400,-200" 
+               disableautobackground="true" >
+            <!-- Box Background and Border -->
+			<!-- depth Higher than PNG to layer on top if needed -->
+			<!-- height Big size; height auto-adjusts with content -->
+			<!-- pos Right under PNG; positive Y moves down -->
+            <sprite depth="1" name="boxBackground" sprite="menu_empty3px" pos="0,0" color="[darkGrey]" type="sliced" fillcenter="true" globalopacitymod="0.7" />
+            <sprite depth="2" name="boxBorder" sprite="menu_empty3px" pos="0,0" color="[red]" type="sliced" fillcenter="false" globalopacitymod="0.8" />
+
+            <!-- Header: Server Name (Localized) -->
+            <label name="boxHeader"
+                   depth="3"
+                   width="980"
+                   height="50"
+                   pos="0,-10"
+                   text_key="tf_serverName"
+                   font_size="36"
+                   color="[white]"
+                   justify="center"
+                   effect="Outline8"
+                   effect_color="0,0,0,255"
+                   effect_distance="2,2" />
+
+            <!-- Rules Grid (Left Inside Box) -->
+            <label pos="10,-70" depth="5" color="[red]" text_key="tf_serverRulesTitle" font_size="24" />
+
+            <grid pos="20,-102" rows="0" cell_width="480" cell_height="32" repeat_content="false" arrangement="vertical" font_size="12" depth="5">
+                <label depth="3" color="[white]" text_key="tf_rule1" />
+                <label depth="3" color="[white]" text_key="tf_rule2" />
+                <label depth="3" color="[white]" text_key="tf_rule3" />
+                <label depth="3" color="[white]" text_key="tf_rule4" />
+                <label depth="3" color="[white]" text_key="tf_rule5" />
+                <label depth="3" color="[white]" text_key="tf_rule6" />
+                <label depth="3" color="[white]" text_key="tf_rule7" />
+                <label depth="3" color="[white]" text_key="tf_rule8" />
+            </grid>
+
+            <!-- Info Grid (Right Inside Box) -->
+            <label pos="600,-70" depth="5" color="[red]" text_key="tf_serverInfoTitle" font_size="24" />
+
+            <grid pos="600,-102" rows="0" cell_width="470" cell_height="32" repeat_content="false" arrangement="vertical" font_size="12" depth="5">
+                <label depth="3" color="[white]" text_key="tf_info1" />
+                <label depth="3" color="[white]" text_key="tf_info2" />
+                <label depth="3" color="[white]" text_key="tf_info3" />
+                <label depth="3" color="[white]" text_key="tf_info4" />
+                <label depth="3" color="[white]" text_key="tf_info5" />
+                <label depth="3" color="[white]" text_key="tf_info6" />
+                <label depth="3" color="[white]" text_key="tf_info7" />
+                <label depth="3" color="[white]" text_key="tf_info8" />
+            </grid>
+        </panel>
+    </append>
